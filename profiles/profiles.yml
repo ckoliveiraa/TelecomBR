@@ -7,7 +7,7 @@ telecom:
       method: service-account
       project: atmos-489611
       dataset: telecom_dev
-      keyfile: /opt/airflow/credentials/gcp_credentials.json
+      keyfile: "{{ env_var('GCP_KEYFILE', 'credentials/gcp_credentials.json') }}"
       location: US
       threads: 4
       job_execution_timeout_seconds: 300
@@ -19,7 +19,7 @@ telecom:
       method: service-account
       project: atmos-489611
       dataset: telecom_prod
-      keyfile: /opt/airflow/credentials/gcp_credentials.json
+      keyfile: "{{ env_var('GCP_KEYFILE', 'credentials/gcp_credentials.json') }}"
       location: US
       threads: 4
       job_execution_timeout_seconds: 300
