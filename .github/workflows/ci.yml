@@ -23,9 +23,10 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
+          cache-dependency-path: requirements.txt
 
-      - name: Instalar dbt-bigquery
-        run: pip install dbt-bigquery==1.8.3
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
 
       - name: Configurar credenciais GCP
         run: |
