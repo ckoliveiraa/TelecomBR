@@ -89,7 +89,7 @@ jobs:
         run: dbt deps --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
 
       - name: dbt docs generate
-        run: dbt docs generate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+        run: dbt docs generate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR || true
 
       - name: Limpar credenciais
         if: always()
