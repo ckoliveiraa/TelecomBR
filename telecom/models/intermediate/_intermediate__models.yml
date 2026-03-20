@@ -1,0 +1,134 @@
+version: 2
+
+models:
+  - name: int_acessos_enriquecidos
+    description: >
+      Hub central da camada intermediate. Recebe dados limpos da staging e aplica
+      conversão de tipos, construção de data_referencia, categorização de velocidade,
+      classificação de grupo de empresa e flag is_grande_operadora.
+    columns:
+      - name: ano
+        description: "Ano de referência (INT64)"
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês de referência (INT64)"
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Primeiro dia do mês de referência, construído a partir de ano e mes"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "ID do município - IBGE 7 dígitos"
+      - name: cnpj
+        description: "CNPJ da empresa prestadora"
+        tests:
+          - not_null
+      - name: empresa
+        description: "Nome da empresa prestadora"
+      - name: porte_empresa
+        description: "Porte da empresa (Pequeno Porte, Grande Porte, etc.)"
+      - name: tecnologia
+        description: "Tecnologia de acesso (ADSL, VDSL, Fibra Óptica, VSAT, etc.)"
+      - name: transmissao
+        description: "Meio de transmissão (Cabeada, Satélite, etc.)"
+      - name: velocidade
+        description: "Faixa de velocidade contratada conforme classificação original da Anatel"
+      - name: produto
+        description: "Tipo de produto (pode ser nulo)"
+      - name: acessos
+        description: "Quantidade de contratos ativos (INT64)"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+      - name: velocidade_categoria
+        description: >
+          Agrupamento simplificado de faixas de velocidade:
+          'Até 1 Mbps', '1 a 8 Mbps', '8 a 34 Mbps', '34 a 100 Mbps',
+          'Acima de 100 Mbps', 'Não Informado'
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'Até 1 Mbps'
+                - '1 a 8 Mbps'
+                - '8 a 34 Mbps'
+                - '34 a 100 Mbps'
+                - 'Acima de 100 Mbps'
+                - 'Não Informado'
+      - name: grupo_empresa
+        description: >
+          Classificação da empresa nos grandes grupos do mercado de telecomunicações:
+          Vivo, Claro, TIM, Oi ou Outras
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'Vivo'
+                - 'Claro'
+                - 'TIM'
+                - 'Oi'
+                - 'Outras'
+      - name: is_grande_operadora
+        description: "TRUE quando a empresa é classificada como Grande Porte pela Anatel"
+        tests:
+          - not_null
+
+  - name: int_participacao_mercado
+    description: >
+      Calcula a participação de mercado de cada empresa por UF e período, com base
+      no total de acessos. Agrega acessos por empresa/UF/período e calcula a proporção
+      em relação ao total de acessos da UF no mesmo período.
+    columns:
+      - name: ano
+        description: "Ano de referência"
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês de referência"
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Primeiro dia do mês de referência"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests:
+          - not_null
+      - name: cnpj
+        description: "CNPJ da empresa prestadora"
+        tests:
+          - not_null
+      - name: empresa
+        description: "Nome da empresa prestadora"
+      - name: grupo_empresa
+        description: "Grupo de operadora (Vivo, Claro, TIM, Oi, Outras)"
+      - name: porte_empresa
+        description: "Porte da empresa"
+      - name: is_grande_operadora
+        description: "TRUE quando Grande Porte"
+      - name: acessos_empresa
+        description: "Total de acessos da empresa na UF no período"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+      - name: total_acessos_uf
+        description: "Total de acessos de todas as empresas na UF no período"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+      - name: participacao_mercado_uf
+        description: "Proporção de acessos da empresa em relação ao total da UF (0 a 1)"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "BETWEEN 0 AND 1"
+

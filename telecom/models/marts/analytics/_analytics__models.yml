@@ -1,0 +1,113 @@
+version: 2
+
+models:
+  - name: mart_evolucao_tecnologia
+    description: >
+      Evolução da distribuição de tecnologias de acesso (Fibra, ADSL, VDSL, etc.)
+      ao longo do tempo, agregada por ano, mês e UF.
+    columns:
+      - name: ano
+        description: "Ano de referência"
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês de referência"
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Primeiro dia do mês de referência"
+        tests:
+          - not_null
+      - name: tecnologia
+        description: "Tecnologia de acesso"
+        tests:
+          - not_null
+      - name: transmissao
+        description: "Meio de transmissão"
+      - name: velocidade_categoria
+        description: "Categoria agrupada de velocidade"
+        tests:
+          - not_null
+      - name: acessos_tecnologia
+        description: "Total de acessos para a combinação de tecnologia e velocidade no período"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+      - name: qtd_empresas_ativas
+        description: "Quantidade de empresas distintas que oferecem a tecnologia no período"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+      - name: total_acessos_brasil
+        description: "Total nacional de acessos no período"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+      - name: participacao_tecnologia
+        description: "Proporção da tecnologia no total nacional de acessos (0 a 1)"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "BETWEEN 0 AND 1"
+
+  - name: mart_mercado_por_uf
+    description: >
+      Participação de mercado dos grandes grupos (Vivo, Claro, TIM, Oi, Outras)
+      por UF e período, com total de acessos e share calculado.
+    columns:
+      - name: ano
+        description: "Ano de referência"
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês de referência"
+        tests:
+          - not_null
+      - name: data_referencia
+        description: "Primeiro dia do mês de referência"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests:
+          - not_null
+      - name: cnpj
+        description: "CNPJ da empresa prestadora"
+        tests:
+          - not_null
+      - name: empresa
+        description: "Nome da empresa prestadora"
+      - name: grupo_empresa
+        description: "Grupo de operadora (Vivo, Claro, TIM, Oi, Outras)"
+      - name: porte_empresa
+        description: "Porte da empresa"
+      - name: is_grande_operadora
+        description: "TRUE quando a empresa é classificada como Grande Porte"
+      - name: acessos_empresa
+        description: "Total de acessos da empresa na UF no período"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+      - name: total_acessos_uf
+        description: "Total de acessos de todas as empresas na UF no período"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+      - name: participacao_mercado_uf
+        description: "Proporção de acessos da empresa em relação ao total da UF (0 a 1)"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "BETWEEN 0 AND 1"
+      - name: ranking_uf
+        description: "Posição da empresa no ranking de acessos dentro da UF no período"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 1"
+      - name: is_top3_uf
+        description: "TRUE quando a empresa está entre as 3 maiores da UF no período"
+        tests:
+          - not_null

@@ -1,0 +1,19 @@
+# Credenciais GCP — nunca commitar
+credentials/
+*.json
+skill.md
+# Env local
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# dbt
+telecom/dbt_packages/
+telecom/target/
+telecom/dbt_modules/
+telecomdbt_packages/
+telecom/logs/
+logs/

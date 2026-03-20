@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: fct_acessos
+    description: >
+      Tabela fato central do projeto. Contém todos os acessos de banda larga fixa
+      reportados à ANATEL, particionada por data_referencia e clusterizada por UF e grupo_empresa.
+    columns:
+      - name: acessos_id
+        description: >
+          Hash MD5 gerado para identificação da linha. A fonte ANATEL não possui
+          chave primária definida e pode conter duplicatas — este campo não garante
+          unicidade, serve apenas como identificador de linha para o incremental merge.
+      - name: data_referencia
+        description: "Primeiro dia do mês de referência (chave de partição)"
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano de referência"
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês de referência"
+        tests:
+          - not_null
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests:
+          - not_null
+      - name: id_municipio
+        description: "ID do município - IBGE 7 dígitos"
+      - name: cnpj
+        description: "CNPJ da empresa prestadora"
+        tests:
+          - not_null
+      - name: empresa
+        description: "Nome da empresa prestadora"
+      - name: grupo_empresa
+        description: "Grupo de operadora (Vivo, Claro, TIM, Oi, Outras)"
+        tests:
+          - not_null
+      - name: porte_empresa
+        description: "Porte da empresa conforme classificação Anatel"
+      - name: is_grande_operadora
+        description: "TRUE quando a empresa é classificada como Grande Porte"
+      - name: tecnologia
+        description: "Tecnologia de acesso (ADSL, VDSL, Fibra Óptica, VSAT, etc.)"
+      - name: transmissao
+        description: "Meio de transmissão (Cabeada, Satélite, etc.)"
+      - name: velocidade
+        description: "Faixa de velocidade contratada conforme classificação original da Anatel"
+      - name: velocidade_categoria
+        description: "Agrupamento simplificado de faixas de velocidade"
+        tests:
+          - not_null
+      - name: produto
+        description: "Tipo de produto (pode ser nulo)"
+      - name: acessos
+        description: "Quantidade de contratos ativos"
+        tests:
+          - not_null

@@ -1,0 +1,81 @@
+name: CI — Validar em dev e abrir PR
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+env:
+  DBT_PROJECT_DIR: telecom
+  DBT_PROFILES_DIR: profiles
+
+jobs:
+  dbt-ci:
+    name: Validar pipeline em dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Instalar dbt-bigquery
+        run: pip install dbt-bigquery==1.8.3
+
+      - name: Configurar credenciais GCP
+        run: |
+          mkdir -p credentials
+          echo '${{ secrets.GCP_CREDENTIALS }}' > credentials/gcp_credentials.json
+
+      - name: dbt deps
+        run: dbt deps --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt run — staging
+        env:
+          DBT_TARGET: dev
+        run: dbt run --select staging --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt test — staging
+        env:
+          DBT_TARGET: dev
+        run: dbt test --select staging --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt run — intermediate
+        env:
+          DBT_TARGET: dev
+        run: dbt run --select intermediate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt test — intermediate
+        env:
+          DBT_TARGET: dev
+        run: dbt test --select intermediate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt run — marts
+        env:
+          DBT_TARGET: dev
+        run: dbt run --select marts --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt test — marts
+        env:
+          DBT_TARGET: dev
+        run: dbt test --select marts --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: Limpar credenciais
+        if: always()
+        run: rm -f credentials/gcp_credentials.json
+
+      - name: Abrir PR para main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ github.ref_name }}" \
+            --title "ci: pipeline validado em dev — ${{ github.ref_name }}" \
+            --body "Pipeline dbt validado com sucesso em dev. Pronto para deploy em prd." \
+          || echo "PR já existe para esta branch"

@@ -1,0 +1,73 @@
+name: dbt Pipeline — Telecom ANATEL
+
+on:
+  push:
+    branches:
+      - main                # dispara quando PR é mergeado na main
+  schedule:
+    - cron: '0 6 1 * *'   # todo dia 1 do mês às 06:00 UTC
+  workflow_dispatch:        # disparo manual pela UI do GitHub
+
+env:
+  DBT_PROJECT_DIR: telecom
+  DBT_PROFILES_DIR: profiles
+
+jobs:
+  dbt-pipeline:
+    name: Executar pipeline dbt
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Instalar dbt-bigquery
+        run: pip install dbt-bigquery==1.8.3
+
+      - name: Configurar credenciais GCP
+        run: |
+          mkdir -p credentials
+          echo '${{ secrets.GCP_CREDENTIALS }}' > credentials/gcp_credentials.json
+
+      - name: dbt deps
+        run: dbt deps --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt run — staging
+        env:
+          DBT_TARGET: prd
+        run: dbt run --select staging --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt test — staging
+        env:
+          DBT_TARGET: prd
+        run: dbt test --select staging --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt run — intermediate
+        env:
+          DBT_TARGET: prd
+        run: dbt run --select intermediate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt test — intermediate
+        env:
+          DBT_TARGET: prd
+        run: dbt test --select intermediate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt run — marts
+        env:
+          DBT_TARGET: prd
+        run: dbt run --select marts --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt test — marts
+        env:
+          DBT_TARGET: prd
+        run: dbt test --select marts --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: Limpar credenciais
+        if: always()
+        run: rm -f credentials/gcp_credentials.json

@@ -1,0 +1,57 @@
+version: 2
+
+sources:
+  - name: anatel
+    description: >
+      Fonte pública ANATEL de microdados de banda larga fixa, disponibilizada via Base dos Dados
+      no projeto basedosdados.br_anatel_banda_larga_fixa.
+    database: basedosdados
+    schema: br_anatel_banda_larga_fixa
+    tables:
+      - name: microdados
+
+models:
+  - name: stg_anatel_microdados
+    description: >
+      Staging dos microdados ANATEL. Seleciona e padroniza as colunas brutas,
+      remove registros com acessos nulos ou negativos e garante tipos consistentes.
+    columns:
+      - name: ano
+        description: "Ano de referência"
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês de referência"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+              quote: false
+      - name: sigla_uf
+        description: "Sigla da Unidade da Federação"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO']
+      - name: id_municipio
+        description: "ID do município - IBGE 7 dígitos"
+      - name: cnpj
+        description: "Cadastro Nacional de Pessoa Jurídica"
+        tests:
+          - not_null
+      - name: empresa
+        description: "Nome da empresa"
+      - name: porte_empresa
+        description: "Porte da empresa"
+      - name: tecnologia
+        description: "Tecnologia de transmissão"
+      - name: transmissao
+        description: "Meios de transmissão"
+      - name: velocidade
+        description: "Velocidade contratada"
+      - name: produto
+        description: "Tipo de produto"
+      - name: acessos
+        description: "Número total de contratos"
+        tests:
+          - not_null
