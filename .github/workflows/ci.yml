@@ -12,6 +12,7 @@ permissions:
 env:
   DBT_PROJECT_DIR: telecom
   DBT_PROFILES_DIR: profiles
+  DBT_TARGET: dev
 
 jobs:
   dbt-ci:
@@ -40,35 +41,17 @@ jobs:
       - name: dbt deps
         run: dbt deps --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
 
-      - name: dbt run — staging
-        env:
-          DBT_TARGET: dev
-        run: dbt run --select staging --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+      - name: dbt build — staging
+        run: dbt build --select staging --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
 
-      - name: dbt test — staging
-        env:
-          DBT_TARGET: dev
-        run: dbt test --select staging --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+      - name: dbt build — intermediate
+        run: dbt build --select intermediate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
 
-      - name: dbt run — intermediate
-        env:
-          DBT_TARGET: dev
-        run: dbt run --select intermediate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+      - name: dbt build — marts
+        run: dbt build --select marts --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
 
-      - name: dbt test — intermediate
-        env:
-          DBT_TARGET: dev
-        run: dbt test --select intermediate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
-
-      - name: dbt run — marts
-        env:
-          DBT_TARGET: dev
-        run: dbt run --select marts --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
-
-      - name: dbt test — marts
-        env:
-          DBT_TARGET: dev
-        run: dbt test --select marts --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+      - name: dbt docs generate
+        run: dbt docs generate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR || true
 
       - name: Limpar credenciais
         if: always()
