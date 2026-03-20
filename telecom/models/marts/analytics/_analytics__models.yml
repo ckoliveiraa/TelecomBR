@@ -33,23 +33,27 @@ models:
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "> 0"
+              arguments:
+                expression: "> 0"
       - name: qtd_empresas_ativas
         description: "Quantidade de empresas distintas que oferecem a tecnologia no período"
         tests:
           - dbt_utils.expression_is_true:
-              expression: "> 0"
+              arguments:
+                expression: "> 0"
       - name: total_acessos_brasil
         description: "Total nacional de acessos no período"
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "> 0"
+              arguments:
+                expression: "> 0"
       - name: participacao_tecnologia
         description: "Proporção da tecnologia no total nacional de acessos (0 a 1)"
         tests:
           - dbt_utils.expression_is_true:
-              expression: "BETWEEN 0 AND 1"
+              arguments:
+                expression: "BETWEEN 0 AND 1"
 
   - name: mart_mercado_por_uf
     description: >
@@ -89,24 +93,28 @@ models:
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "> 0"
+              arguments:
+                expression: "> 0"
       - name: total_acessos_uf
         description: "Total de acessos de todas as empresas na UF no período"
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "> 0"
+              arguments:
+                expression: "> 0"
       - name: participacao_mercado_uf
         description: "Proporção de acessos da empresa em relação ao total da UF (0 a 1)"
         tests:
           - dbt_utils.expression_is_true:
-              expression: "BETWEEN 0 AND 1"
+              arguments:
+                expression: "BETWEEN 0 AND 1"
       - name: ranking_uf
         description: "Posição da empresa no ranking de acessos dentro da UF no período"
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: ">= 1"
+              arguments:
+                expression: ">= 1"
       - name: is_top3_uf
         description: "TRUE quando a empresa está entre as 3 maiores da UF no período"
         tests:
