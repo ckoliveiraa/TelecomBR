@@ -46,7 +46,8 @@ models:
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
+              arguments:
+                expression: ">= 0"
       - name: velocidade_categoria
         description: >
           Agrupamento simplificado de faixas de velocidade:
@@ -119,16 +120,19 @@ models:
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "> 0"
+              arguments:
+                expression: "> 0"
       - name: total_acessos_uf
         description: "Total de acessos de todas as empresas na UF no período"
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "> 0"
+              arguments:
+                expression: "> 0"
       - name: participacao_mercado_uf
         description: "Proporção de acessos da empresa em relação ao total da UF (0 a 1)"
         tests:
           - dbt_utils.expression_is_true:
-              expression: "BETWEEN 0 AND 1"
+              arguments:
+                expression: "BETWEEN 0 AND 1"
 
