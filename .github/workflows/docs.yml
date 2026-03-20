@@ -1,0 +1,78 @@
+name: Publicar documentacao dbt no GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  DBT_PROJECT_DIR: telecom
+  DBT_PROFILES_DIR: profiles
+
+jobs:
+  deploy-docs:
+    name: Gerar e publicar docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Configurar credenciais GCP
+        run: |
+          mkdir -p credentials
+          echo '${{ secrets.GCP_CREDENTIALS }}' > credentials/gcp_credentials.json
+
+      - name: dbt deps
+        run: dbt deps --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: dbt docs generate
+        env:
+          DBT_TARGET: prd
+        run: dbt docs generate --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
+
+      - name: Limpar credenciais
+        if: always()
+        run: rm -f credentials/gcp_credentials.json
+
+      - name: Preparar pasta para Pages
+        run: |
+          mkdir -p _site
+          cp telecom/target/index.html _site/
+          cp telecom/target/manifest.json _site/
+          cp telecom/target/catalog.json _site/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy
+        id: deploy
+        uses: actions/deploy-pages@v4
