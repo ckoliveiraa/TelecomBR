@@ -47,7 +47,7 @@ ANATEL (Base dos Dados)
 
 | Ferramenta | Uso |
 |---|---|
-| dbt 1.11.7 | Transformação e testes |
+| dbt-bigquery 1.11.1 | Transformação e testes |
 | BigQuery | Data warehouse |
 | Base dos Dados | Fonte dos microdados ANATEL |
 | GitHub Actions | CI/CD |
