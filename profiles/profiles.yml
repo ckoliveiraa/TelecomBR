@@ -5,9 +5,9 @@ telecom:
     dev:
       type: bigquery
       method: service-account
-      project: atmos-489611
+      project: telecombr-dev
       dataset: telecom_dev
-      keyfile: "{{ env_var('GCP_KEYFILE', 'credentials/gcp_credentials.json') }}"
+      keyfile: "{{ env_var('GCP_KEYFILE_DEV', 'credentials/gcp_credentials_dev.json') }}"
       location: US
       threads: 4
       job_execution_timeout_seconds: 300
@@ -17,9 +17,9 @@ telecom:
     prd:
       type: bigquery
       method: service-account
-      project: atmos-489611
+      project: telecombr-prd
       dataset: telecom_prod
-      keyfile: "{{ env_var('GCP_KEYFILE', 'credentials/gcp_credentials.json') }}"
+      keyfile: "{{ env_var('GCP_KEYFILE_PRD', 'credentials/gcp_credentials_prd.json') }}"
       location: US
       threads: 4
       job_execution_timeout_seconds: 300
