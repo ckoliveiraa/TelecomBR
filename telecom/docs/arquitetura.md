@@ -149,8 +149,6 @@ Por padrão, o dbt constrói o nome do schema concatenando o schema padrão do p
 ```sql
 {% macro generate_schema_name(custom_schema_name, node) -%}
 
-    {%- set default_schema = target.schema -%}
-
     {%- if 'staging' in node.fqn -%}
         stg_telecom
 
@@ -161,7 +159,7 @@ Por padrão, o dbt constrói o nome do schema concatenando o schema padrão do p
         marts_telecom
 
     {%- else -%}
-        {{ default_schema }}
+        {{ target.schema }}
 
     {%- endif -%}
 
@@ -170,7 +168,7 @@ Por padrão, o dbt constrói o nome do schema concatenando o schema padrão do p
 
 **Como funciona:** A macro inspeciona o **Fully Qualified Name** (`fqn`) do nó dbt — que inclui o caminho de diretório do modelo — e atribui um nome de dataset fixo com base no diretório. Isso garante que os schemas sejam sempre `stg_telecom`, `int_telecom` e `marts_telecom`, independentemente do schema padrão configurado no perfil dbt.
 
-**Implicação prática:** Mesmo em ambientes de desenvolvimento onde o `target.schema` pode ser `dev_fulano`, os datasets criados serão `stg_telecom`, `int_telecom` e `marts_telecom`. Se for necessário isolar ambientes, é recomendado usar projetos GCP distintos para dev e prod.
+**Implicação prática:** O isolamento entre ambientes é feito por projetos GCP distintos — `telecombr-dev` para desenvolvimento e `telecombr-prd` para produção. Os nomes dos datasets são idênticos nos dois projetos.
 
 ---
 
