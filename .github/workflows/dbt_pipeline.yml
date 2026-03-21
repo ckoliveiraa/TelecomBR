@@ -43,7 +43,7 @@ jobs:
       - name: Configurar credenciais GCP
         run: |
           mkdir -p credentials
-          echo '${{ secrets.GCP_CREDENTIALS }}' > credentials/gcp_credentials.json
+          echo '${{ secrets.GCP_CREDENTIALS_PRD }}' > credentials/gcp_credentials_prd.json
 
       - name: dbt deps
         run: dbt deps --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR
@@ -62,7 +62,7 @@ jobs:
 
       - name: Limpar credenciais
         if: always()
-        run: rm -f credentials/gcp_credentials.json
+        run: rm -f credentials/gcp_credentials_prd.json
 
       - name: Preparar _site
         run: |

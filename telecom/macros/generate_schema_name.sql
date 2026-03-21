@@ -1,7 +1,5 @@
 {% macro generate_schema_name(custom_schema_name, node) -%}
 
-    {%- set default_schema = target.schema -%}
-
     {%- if 'staging' in node.fqn -%}
         stg_telecom
 
@@ -12,7 +10,7 @@
         marts_telecom
 
     {%- else -%}
-        {{ default_schema }}
+        {{ target.schema }}
 
     {%- endif -%}
 
