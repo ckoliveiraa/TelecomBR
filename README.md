@@ -81,7 +81,7 @@ push em branch (exceto main)
 
 ## Configuração local
 
-**Pré-requisitos:** Python 3.12, conta GCP com acesso ao projeto `atmos-489611`
+**Pré-requisitos:** Python 3.12, conta GCP.
 
 ```bash
 # Instalar dependências
