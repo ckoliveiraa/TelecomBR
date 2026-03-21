@@ -1,18 +1,18 @@
 {% macro generate_schema_name(custom_schema_name, node) -%}
 
-    {%- set default_schema = target.schema -%}
+    {%- set env = target.name -%}
 
     {%- if 'staging' in node.fqn -%}
-        stg_telecom
+        stg_telecom_{{ env }}
 
     {%- elif 'intermediate' in node.fqn -%}
-        int_telecom
+        int_telecom_{{ env }}
 
     {%- elif 'marts' in node.fqn -%}
-        marts_telecom
+        marts_telecom_{{ env }}
 
     {%- else -%}
-        {{ default_schema }}
+        {{ target.schema }}
 
     {%- endif -%}
 
