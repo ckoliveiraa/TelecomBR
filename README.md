@@ -98,7 +98,9 @@ dbt docs generate --profiles-dir profiles --project-dir telecom
 dbt docs serve --profiles-dir profiles --project-dir telecom
 ```
 
-**Credenciais:** coloque o arquivo de service account em `credentials/gcp_credentials.json` (já ignorado pelo `.gitignore`).
+**Credenciais:** coloque os arquivos de service account em `credentials/` (já ignorado pelo `.gitignore`):
+- `credentials/gcp_credentials_dev.json` → projeto `telecombr-dev`
+- `credentials/gcp_credentials_prd.json` → projeto `telecombr-prd`
 
 ---
 
@@ -106,7 +108,8 @@ dbt docs serve --profiles-dir profiles --project-dir telecom
 
 | Secret | Descrição |
 |---|---|
-| `GCP_CREDENTIALS` | Conteúdo JSON do service account GCP |
+| `GCP_CREDENTIALS_DEV` | Conteúdo JSON do service account do projeto `telecombr-dev` |
+| `GCP_CREDENTIALS_PRD` | Conteúdo JSON do service account do projeto `telecombr-prd` |
 
 ---
 

@@ -72,25 +72,26 @@ O perfil dbt é configurado no arquivo `~/.dbt/profiles.yml` (fora do repositór
 
 ```yaml
 telecom:
-  target: dev
+  target: "{{ env_var('DBT_TARGET', 'prd') }}"
   outputs:
     dev:
       type: bigquery
-      method: oauth                  # usa ADC (gcloud auth application-default login)
-      project: seu-projeto-gcp-id   # substitua pelo ID do seu projeto GCP
-      dataset: dev_seu_nome          # schema padrão — sobrescrito pela macro generate_schema_name
+      method: service-account
+      project: telecombr-dev
+      dataset: telecom_dev
+      keyfile: "{{ env_var('GCP_KEYFILE_DEV', 'credentials/gcp_credentials_dev.json') }}"
       threads: 4
-      timeout_seconds: 300
-      location: US                   # localização dos datasets (US ou EU)
+      job_execution_timeout_seconds: 300
+      location: US
 
-    prod:
+    prd:
       type: bigquery
       method: service-account
-      project: projeto-gcp-producao
-      dataset: producao              # sobrescrito pela macro
-      keyfile: /caminho/service-account-prod.json
-      threads: 8
-      timeout_seconds: 600
+      project: telecombr-prd
+      dataset: telecom_prod
+      keyfile: "{{ env_var('GCP_KEYFILE_PRD', 'credentials/gcp_credentials_prd.json') }}"
+      threads: 4
+      job_execution_timeout_seconds: 300
       location: US
 ```
 
@@ -99,9 +100,7 @@ telecom:
 **Verificar a configuração:**
 
 ```bash
-# Dentro da pasta do projeto dbt
-cd c:/Users/caiqu/workspace/NTA/Telecom/telecom
-dbt debug
+dbt debug --profiles-dir profiles --project-dir telecom
 ```
 
 O comando `dbt debug` verifica a conexão com o BigQuery e valida o perfil. Uma saída com `All checks passed!` indica que a configuração está correta.
@@ -113,8 +112,7 @@ O comando `dbt debug` verifica a conexão com o BigQuery e valida o perfil. Uma 
 O projeto depende do pacote `dbt_utils`. Após clonar o repositório, instale as dependências:
 
 ```bash
-cd c:/Users/caiqu/workspace/NTA/Telecom/telecom
-dbt deps
+dbt deps --profiles-dir profiles --project-dir telecom
 ```
 
 Este comando lê o arquivo `packages.yml` e baixa o pacote `dbt-labs/dbt_utils==1.3.0` para a pasta `dbt_packages/`. Este passo é necessário apenas uma vez por ambiente (ou quando `packages.yml` for atualizado).
